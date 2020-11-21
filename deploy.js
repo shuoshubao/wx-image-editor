@@ -1,5 +1,8 @@
 const { readFileSync, writeFileSync } = require('fs');
+const { name } = require('./package');
 
 const htmlContent = readFileSync('./build/index.html').toString();
 
-writeFileSync('./index.html', htmlContent.replace(/\/static\//g, '/build/static/') + '\n');
+const githubPagesStaticPrefix = ['https://shuoshubao.github.io', name, 'build/static'].join('/');
+
+writeFileSync('./index.html', htmlContent.replace(/\/static/g, githubPagesStaticPrefix) + '\n');
