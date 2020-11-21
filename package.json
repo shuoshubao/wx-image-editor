@@ -22,7 +22,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "homepage": "wx-image-editor",
+  "homepage": "wx-image-editor/build",
   "browserslist": {
     "production": [
       ">0.2%",
