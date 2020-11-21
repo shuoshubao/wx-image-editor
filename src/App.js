@@ -21,13 +21,22 @@ export default class App extends React.Component {
             previewImageUrl: avatar,
             visibileModal: false
         };
+        this.elementInputFile = null;
         this.domEvents = this.getDomEvents();
         this.customEvents = this.getCustomEvents();
+    }
+
+    componentWillUnmount() {
+        document.body.removeChild(this.elementInputFile);
     }
 
     getDomEvents() {
         return {
             handleChangeImage: () => {
+                if (this.elementInputFile) {
+                    this.elementInputFile.click();
+                    return;
+                }
                 const { customEvents } = this;
                 const eInput = document.createElement('input');
                 setStyle(eInput, { visibility: 'hidden' });
@@ -37,12 +46,13 @@ export default class App extends React.Component {
                     accept: '.png, .jpg, .jpeg'
                 });
                 document.body.appendChild(eInput);
-                eInput.addEventListener('change', customEvents.changeImageListener);
+                eInput.addEventListener('change', customEvents.changeImageListener, false);
                 eInput.click();
-                document.body.removeChild(eInput);
+                this.elementInputFile = eInput;
             }
         };
     }
+
     getCustomEvents() {
         return {
             changeImageListener: e => {

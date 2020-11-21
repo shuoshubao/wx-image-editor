@@ -1,7 +1,13 @@
+.vc-switch {
+    bottom: 60px !important;
+    right: 0
+}
+
 .app-container .preview-image {
-    width: 70px;
-    height: 70px;
+    width: 200px;
+    height: 200px;
     overflow: hidden;
+    margin-top: 20px;
 }
 
 .modal-image-editor {

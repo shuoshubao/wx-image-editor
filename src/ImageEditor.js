@@ -7,13 +7,25 @@ import AlloyFinger from 'alloyfinger';
 import './transform';
 import { RotateLeft, Close, Confirm } from './svgIcons';
 
-const getInitImageContainerStyle = () => {
-    return {
-        rotate: 0, // 旋转角度
-        scale: 1, // 缩放比
-        translateX: 0,
-        translateY: 0
-    };
+const getBase64 = url => {
+    if (url.startsWith('data:image')) {
+        return url;
+    }
+    // 通过构造函数来创建的 img 实例，在赋予 src 值后就会立刻下载图片，相比 createElement() 创建 <img> 省去了 append()，也就避免了文档冗余和污染
+    return new Promise(reslove => {
+        const img = new Image();
+        img.src = url;
+        img.onload = () => {
+            // 要先确保图片完整获取到，这是个异步事件
+            var canvas = document.createElement('canvas'); // 创建canvas元素
+            const { width, height } = img;
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(img, 0, 0, width, height); // 将图片绘制到canvas中
+            const dataURL = canvas.toDataURL('image/jpeg'); // 转换图片为dataURL
+            reslove(dataURL);
+        };
+    });
 };
 
 export default class ImageEditor extends React.Component {
@@ -41,9 +53,14 @@ export default class ImageEditor extends React.Component {
         this.customEvents = this.getCustomEvents();
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        console.log('🍍', typeof this.props.value);
+        console.log(this.props.value);
+
+        const imageUrl = await getBase64(this.props.value);
+
         this.setState({
-            imageUrl: this.props.value
+            imageUrl
         });
 
         const element = this.imageRef.current;
@@ -93,7 +110,7 @@ export default class ImageEditor extends React.Component {
     getCustomEvents() {
         return {
             // 确认
-            handleOk: async() => {
+            handleOk: async () => {
                 const data = await this.customEvents.getCaptureData();
                 if (this.props.onOk) {
                     this.props.onOk(data);
@@ -125,10 +142,12 @@ export default class ImageEditor extends React.Component {
                 const elementContainer = this.containerRef.current;
                 const elementCaptureContainer = this.captureContainerRef.current;
                 const { x, y, width, height } = elementCaptureContainer.getClientRects()[0];
-                elementContainer.classList.add('is-capturing');
+                console.log({ x, y, width, height });
+                // elementContainer.classList.add('is-capturing');
                 const canvas = await html2canvas(elementContainer, { x, y, width, height });
                 const canvasDataUrl = canvas.toDataURL('image/jepg');
-                elementContainer.classList.remove('is-capturing');
+                // elementContainer.classList.remove('is-capturing');
+                console.log(canvasDataUrl);
                 return canvasDataUrl;
             }
         };
